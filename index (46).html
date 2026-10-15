@@ -1,0 +1,1083 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>신바람컬쳐북 보고용</title>
+<style>
+  /* Layout: single-column card form, sticky progress header */
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600&display=swap');
+
+  :root {
+    --bg: #f7f7f5;
+    --surface: #ffffff;
+    --border: #e2e2de;
+    --fg: #1a1a18;
+    --fg2: #5a5a56;
+    --accent: #2563a8;
+    --accent-light: #e8f0fb;
+    --hint-bg: #f0f4fa;
+    --hint-border: #b8cde8;
+    --progress-bg: #dde8f7;
+    --tag: #2563a8;
+    --correct: #15803d;
+    --warn: #b45309;
+    --radius: 10px;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #13131a;
+      --surface: #1e1e28;
+      --border: #2e2e3e;
+      --fg: #eeeef0;
+      --fg2: #9898a8;
+      --accent: #5b8fd4;
+      --accent-light: #1a2540;
+      --hint-bg: #1a2035;
+      --hint-border: #2e4070;
+      --progress-bg: #1e2d4a;
+      --tag: #5b8fd4;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #13131a;
+    --surface: #1e1e28;
+    --border: #2e2e3e;
+    --fg: #eeeef0;
+    --fg2: #9898a8;
+    --accent: #5b8fd4;
+    --accent-light: #1a2540;
+    --hint-bg: #1a2035;
+    --hint-border: #2e4070;
+    --progress-bg: #1e2d4a;
+    --tag: #5b8fd4;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Noto Sans KR', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    padding-inline: 16px;
+    padding-block: 0;
+  }
+
+  /* Progress bar */
+  #progress-bar {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-inline: -16px;
+  }
+  #progress-bar .label { font-size: 12px; color: var(--fg2); white-space: nowrap; }
+  .prog-track { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
+  #q-counter { font-size: 12px; color: var(--fg2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  /* Sections */
+  .section { max-width: 680px; margin: 0 auto; padding-block: 28px; }
+  .section + .section { border-top: 1px solid var(--border); }
+
+  /* Q card */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .q-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: var(--tag);
+    background: var(--accent-light);
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-bottom: 10px;
+  }
+  .q-title {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 8px;
+    text-wrap: balance;
+  }
+  .q-body {
+    font-size: 14px;
+    color: var(--fg2);
+    margin-bottom: 14px;
+    line-height: 1.75;
+  }
+  .q-body strong { color: var(--fg); }
+
+  /* Hint table */
+  .hint-box {
+    background: var(--hint-bg);
+    border: 1px solid var(--hint-border);
+    border-radius: 7px;
+    padding: 12px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+  }
+  .hint-box table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .hint-box th {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 700;
+    padding: 5px 8px;
+    text-align: left;
+  }
+  .hint-box td { padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .hint-box tr:last-child td { border-bottom: none; }
+
+  /* MC options */
+  .mc-options { display: flex; flex-direction: column; gap: 8px; }
+  .mc-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    font-size: 14px;
+    color: var(--fg);
+    background: var(--bg);
+  }
+  .mc-opt:hover { background: var(--accent-light); border-color: var(--accent); }
+  .mc-opt input[type=radio] { accent-color: var(--accent); margin-top: 3px; flex-shrink: 0; }
+  .mc-opt.selected { background: var(--accent-light); border-color: var(--accent); }
+  .mc-opt.correct { border-color: var(--correct); background: #f0fdf4; }
+  .mc-opt.correct .opt-label { color: var(--correct); font-weight: 700; }
+
+  /* Textarea */
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--fg);
+    background: var(--bg);
+    resize: vertical;
+    line-height: 1.7;
+    transition: border-color .15s;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+
+  .q-ref {
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--accent-light);
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  /* Self-check table for Q14 */
+  .check-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .check-table th {
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 7px 10px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+  .check-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .check-table tr:last-child td { border-bottom: none; }
+  .check-table input[type=text] {
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--fg);
+    padding: 2px 0;
+  }
+  .check-table input[type=text]:focus { outline: none; border-bottom-color: var(--accent); }
+
+  /* 💭 prompt */
+  .prompt-box {
+    background: var(--hint-bg);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 7px 7px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--fg2);
+    margin-top: 10px;
+  }
+
+  /* Header */
+  .survey-header {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-top: 32px;
+    padding-bottom: 24px;
+  }
+  .survey-header h1 {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--fg);
+    margin-bottom: 8px;
+  }
+  .survey-header p { font-size: 13px; color: var(--fg2); }
+  .meta-row { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .meta-item { font-size: 12px; color: var(--fg2); display: flex; align-items: center; gap: 4px; }
+
+  /* Info input */
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 480px) { .info-grid { grid-template-columns: 1fr; } }
+  .info-field label { display: block; font-size: 12px; color: var(--fg2); margin-bottom: 5px; font-weight: 500; }
+  .info-field input, .info-field select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--fg);
+    background: var(--bg);
+  }
+  .info-field input:focus, .info-field select:focus { outline: none; border-color: var(--accent); }
+
+  /* Submit */
+  #submit-btn {
+    display: block;
+    width: 100%;
+    max-width: 680px;
+    margin: 24px auto 40px;
+    padding: 15px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  #submit-btn:hover { opacity: .88; }
+  #submit-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--fg);
+    color: var(--bg);
+    padding: 10px 20px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 200;
+  }
+  #toast.show { opacity: 1; }
+
+  /* Done screen */
+  #done-screen {
+    display: none;
+    max-width: 680px;
+    margin: 60px auto;
+    text-align: center;
+    padding: 40px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+  #done-screen .done-icon { font-size: 48px; margin-bottom: 16px; }
+  #done-screen h2 { font-family: 'Noto Serif KR', serif; font-size: 20px; margin-bottom: 8px; }
+  #done-screen p { font-size: 14px; color: var(--fg2); }
+
+  /* Loading */
+  #loading { text-align: center; padding: 60px 16px; color: var(--fg2); font-size: 14px; }
+  #already-done { display: none; max-width: 680px; margin: 60px auto; text-align: center; padding: 40px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+</style>
+
+<div id="loading">설문을 불러오는 중...</div>
+<div id="already-done">
+  <div style="font-size:40px;margin-bottom:16px">✅</div>
+  <h2 style="font-family:'Noto Serif KR',serif;font-size:18px;margin-bottom:8px">이미 제출하셨습니다</h2>
+  <p style="font-size:14px;color:var(--fg2)">응답해주셔서 감사합니다.</p>
+</div>
+
+<div id="survey-wrap" hidden>
+  <!-- Progress -->
+  <div id="progress-bar">
+    <span class="label">진행률</span>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    <span id="q-counter">0 / 15</span>
+  </div>
+
+  <!-- Header -->
+  <div class="survey-header">
+    <h1>테스코㈜ 신바람 컬처북 2차 설문</h1>
+    <p>총 15문항 · 객관식 5문항 + 주관식 10문항</p>
+    <div class="meta-row">
+      <span class="meta-item">⏱ 소요 시간 약 15분</span>
+    </div>
+  </div>
+
+  <!-- 기본 정보 -->
+  <div class="section">
+    <div class="q-card">
+      <div class="q-tag">기본 정보</div>
+      <div class="q-title">응답자 정보를 입력해주세요</div>
+      <div class="info-grid">
+        <div class="info-field">
+          <label>이름 *</label>
+          <input type="text" id="f-name" placeholder="홍길동">
+        </div>
+        <div class="info-field">
+          <label>사업장 *</label>
+          <select id="f-site">
+            <option value="">선택하세요</option>
+            <option>대전 본사공장</option>
+            <option>개발센터</option>
+            <option>진주공장</option>
+          </select>
+        </div>
+        <div class="info-field">
+          <label>사업부 *</label>
+          <select id="f-dept">
+            <option value="">사업장을 먼저 선택하세요</option>
+          </select>
+        </div>
+        <div class="info-field">
+          <label>부서 *</label>
+          <input type="text" id="f-team" placeholder="예) 구매팀, 생산관리팀 등">
+        </div>
+      </div>
+
+      <!-- 개인정보 수집 동의 -->
+      <div style="margin-top:16px;padding:12px 14px;background:var(--hint-bg);border:1px solid var(--hint-border);border-radius:8px;font-size:13px;color:var(--fg2)">
+        <div style="font-weight:700;color:var(--fg);margin-bottom:6px">📋 개인정보 수집·이용 동의 (필수)</div>
+        <div style="margin-bottom:8px;line-height:1.7">
+          <strong>수집 항목:</strong> 이름, 사업장, 사업부, 부서, 설문 응답 내용<br>
+          <strong>수집 목적:</strong> 신바람 컬처북 이해도 파악 및 조직문화 개선<br>
+          <strong>보유 기간:</strong> 설문 종료 후 1년<br>
+          <strong>담당부서:</strong> 인사총무파트 (내부 열람 한정)
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500;color:var(--fg)">
+          <input type="checkbox" id="f-agree" style="accent-color:var(--accent);width:16px;height:16px;flex-shrink:0">
+          위 내용을 확인하였으며, 개인정보 수집·이용에 동의합니다.
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 객관식 Q1~Q5 ===== -->
+  <div class="section">
+    <div class="q-card">
+      <div class="q-tag">Q1 · 인재상: 기술과 사람 · 탁월·협력</div>
+      <div class="q-title">💡 나만 아는 노하우</div>
+      <div class="q-body">재료시험 장비의 시험 조건 세팅 노하우를 팀에서 당신만 알고 있습니다. 팀원들은 시험 때마다 당신에게 물어보고, 당신이 휴가를 가면 일정이 밀립니다. 어떻게 하겠습니까?</div>
+      <div class="mc-options" id="q1-opts">
+        <label class="mc-opt"><input type="radio" name="q1" value="1"> <span>① 물어볼 때마다 바로 친절하게 알려준다. 내가 있을 때는 문제가 없다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q1" value="2"> <span>② 오랜 경험으로 쌓은 노하우는 나의 전문성이므로 지금처럼 필요할 때만 지원한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q1" value="3"> <span>③ 세팅 절차를 SOP로 문서화해 지정 플랫폼에 등록하고, 팀원 대상으로 짧은 실습 설명회를 연다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q1" value="4"> <span>④ 팀장에게 팀원 교육 계획을 세워 달라고 요청한다.</span></label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-tag">Q2 · 인재상: 도전 · 탁월</div>
+      <div class="q-title">💡 정기 보고서 AI 자동화 제안</div>
+      <div class="q-body">매월 엑셀 수작업으로 3일이 걸리는 정기 보고서가 있습니다. 지금 방식으로도 오류 없이 잘 돌아가고 있습니다. 동료가 AI(Claude)로 자동화해 보자고 제안했지만, 처음에는 오히려 시간이 더 걸릴 수 있습니다. 어떻게 하겠습니까?</div>
+      <div class="mc-options" id="q2-opts">
+        <label class="mc-opt"><input type="radio" name="q2" value="1"> <span>① 다음 달부터 AI 방식으로 전면 전환해 바로 시간을 줄인다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q2" value="2"> <span>② 지금 방식이 안정적이고 문제도 없으니 그대로 유지한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q2" value="3"> <span>③ 회사 차원의 AI 교육이 끝난 뒤에 도입 여부를 검토한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q2" value="4"> <span>④ 기존 방식과 1~2개월 병행하며 파일럿으로 적용한다. 결과를 비교해 검증하고, 잘된 점과 실패한 점을 팀에 공유한다.</span></label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-tag">Q3 · 인재상: 숫자와 현장 · 정직·탁월</div>
+      <div class="q-title">💡 예산 초과 징조 포착</div>
+      <div class="q-body">분기 중반인데 소모품 구매가 예산의 78%를 이미 소진했습니다. 이 속도라면 분기 내 예산 초과가 예상됩니다. 어떻게 하겠습니까?</div>
+      <div class="mc-options" id="q3-opts">
+        <label class="mc-opt"><input type="radio" name="q3" value="1"> <span>① 분기가 끝나봐야 알 수 있으니 일단 지금은 필요한 만큼 구매한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q3" value="2"> <span>② 팀장에게 "예산이 부족할 것 같습니다"라고 보고한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q3" value="3"> <span>③ 남은 예산·잔여 기간·예상 소진 시점을 계산하고, 항목별 지출 내역을 검토해 조정 가능한 항목을 찾는다. 예상 초과액과 대안(구매 조정·예산 전용 요청)을 수치로 정리해 선제 보고한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q3" value="4"> <span>④ 다른 팀 예산이 남아 있으면 나중에 빌려 쓰면 된다.</span></label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-tag">Q4 · 인재상: 회사의 성장 · 협력·존중</div>
+      <div class="q-title">💡 조직 확대에 따른 ERP 기준 강화</div>
+      <div class="q-body">조직 규모가 커지면서 ERP 입력 기준이 엄격해지고 팀 업무가 늘었습니다. 어떻게 하겠습니까?</div>
+      <div class="mc-options" id="q4-opts">
+        <label class="mc-opt"><input type="radio" name="q4" value="1"> <span>① 업무가 늘어난 만큼 인력 충원을 먼저 요청하고, 충원 전까지는 기존 방식대로 처리한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q4" value="2"> <span>② 이런 변화는 경영진 과제이므로 나는 지금 맡은 업무 성과에만 집중한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q4" value="3"> <span>③ 바뀐 기준을 정확히 익혀 내 업무에 적용하고, "ERP 반려율 감소" 같은 개인 KPI를 스스로 세워 팀장과 합의한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q4" value="4"> <span>④ 지시가 내려오는 부분은 기준에 맞춰 정확히 처리한다.</span></label>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-tag">Q5 · 인재상: 회사의 성장 · 협력·존중</div>
+      <div class="q-title">💡 신입 멘토링과 프로젝트 마감 병행</div>
+      <div class="q-body">이번 달 우리 부서에 신입사원이 입사해 당신이 멘토로 지정됐습니다. 마침 당신도 맡은 프로젝트 마감이 겹쳐 바쁜 시기입니다. 어떻게 하겠습니까?</div>
+      <div class="mc-options" id="q5-opts">
+        <label class="mc-opt"><input type="radio" name="q5" value="1"> <span>① 6개월 성장 로드맵을 기준으로 주 1회 점검 시간을 정해 둔다. 내 업무 일정은 팀장과 우선순위를 조율한다. 멘토링 과정에서 반복해서 받는 질문은 정리해 팀 공용 자료로 남긴다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q5" value="2"> <span>② 지금은 내 프로젝트가 우선이므로 마감 이후로 멘토링 시작을 미뤄 달라고 요청한다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q5" value="3"> <span>③ 멘토링 일지는 기한에 맞춰 제출하고, 신입이 질문하러 올 때만 답해 준다.</span></label>
+        <label class="mc-opt"><input type="radio" name="q5" value="4"> <span>④ 내 업무가 많은 상황이니 업무 경험이 적은 다른 동료로 멘토를 바꿔 달라고 요청한다.</span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 주관식 Q6~Q15 ===== -->
+  <div class="section">
+
+    <!-- Q6 -->
+    <div class="q-card">
+      <div class="q-tag">Q6 · 제1장·제2장 · 주관식</div>
+      <div class="q-ref">📖 참고: GTD·아이젠하워 매트릭스 (11쪽), 중간보고 (20쪽)</div>
+      <div class="q-title">업무 우선순위와 중간보고</div>
+      <div class="q-body">오전 내내 전화 문의, 단순 자료 요청, 단체방 회신을 처리하느라 바빴습니다. 그러다 오늘까지 고객사에 회신하기로 약속한 클레임 원인 분석서를 퇴근 직전에야 시작했고, 결국 약속한 날짜를 넘겼습니다. 왜 이런 일이 생겼다고 생각하나요? 본인 경험과 연결해서 앞으로 어떻게 바꿀지 써 주세요.</div>
+      <textarea id="q6" placeholder="답변을 입력해주세요..."></textarea>
+    </div>
+
+    <!-- Q7 -->
+    <div class="q-card">
+      <div class="q-tag">Q7 · 제2장 · 주관식</div>
+      <div class="q-ref">📖 참고: 보고의 3원칙 (20쪽), 이슈 등급 (24쪽)</div>
+      <div class="q-title">이슈 등급 4단계</div>
+      <div class="q-body">거래처가 납품 일정을 갑자기 1주일 앞당겨 달라고 요청합니다. 현재 생산 일정상 불가능하고, 납기 지연 시 위약금 조항도 걸려 있습니다. 이 상황을 누구에게, 어떤 방식으로 보고해야 하는지 설명해주세요.</div>
+      <div class="hint-box">
+        <table>
+          <tr><th>등급</th><th>기준</th><th>보고 시한</th></tr>
+          <tr><td>🔴 레드(긴급)</td><td>사고·중대손실, 납기 위반, 손실 300만원↑</td><td>30분 내</td></tr>
+          <tr><td>🟠 오렌지(중요)</td><td>1주↑ 납기 지연 예상, 품질 이슈 반복</td><td>당일 내</td></tr>
+          <tr><td>🟡 옐로우(주의)</td><td>소규모 지연, 프로세스 오류</td><td>1~2일 내</td></tr>
+          <tr><td>🟢 그린(일반)</td><td>정상 범위 내 사소한 변동</td><td>주간 보고</td></tr>
+        </table>
+      </div>
+      <textarea id="q7" placeholder="답변을 입력해주세요..."></textarea>
+    </div>
+
+    <!-- Q8 -->
+    <div class="q-card">
+      <div class="q-tag">Q8 · 제2장 · 주관식</div>
+      <div class="q-ref">📖 참고: CIPER (23쪽), 위기 커뮤니케이션 (25쪽)</div>
+      <div class="q-title">CIPER 5단계</div>
+      <div class="q-body">납기가 3일 남은 주요 납품 건을 처리 중이던 핵심 가공 장비가 갑자기 멈췄습니다. 자체 수리가 불가능하고, 외부 업체 출동까지 최소 2일이 걸릴 것으로 예상됩니다. CIPER 5단계에 맞춰 어떻게 보고하고 처리할지 각 단계별로 구체적으로 써주세요.</div>
+      <div class="hint-box">
+        <table>
+          <tr><th>단계</th><th>내용</th></tr>
+          <tr><td>C 상황(Context)</td><td>무슨 일이 발생했는가 (육하원칙)</td></tr>
+          <tr><td>I 영향(Impact)</td><td>피해·영향 정도 (금액·시간 수치화)</td></tr>
+          <tr><td>P 현 조치(Progress)</td><td>지금까지 취한 조치</td></tr>
+          <tr><td>E 에스컬레이션</td><td>누구에게 알릴 것인가</td></tr>
+          <tr><td>R 해결책(Resolution)</td><td>가능한 해결책 2~3가지</td></tr>
+        </table>
+      </div>
+      <textarea id="q8" placeholder="C — 상황:\nI — 영향:\nP — 현 조치:\nE — 에스컬레이션:\nR — 해결책:"></textarea>
+    </div>
+
+    <!-- Q9 -->
+    <div class="q-card">
+      <div class="q-tag">Q9 · 제2장 · 주관식</div>
+      <div class="q-ref">📖 참고: 유형별 지시 대응 (18쪽)</div>
+      <div class="q-title">유형별 지시 대응</div>
+      <div class="q-body">팀장이 "이 보고서 다시 써와"라고만 하고 구체적인 이유는 말해주지 않습니다. 본인이라면 다음에 어떻게 접근하겠습니까? 팀장에게 어떻게 확인하고, 어떻게 수정할지 구체적으로 써주세요.</div>
+      <div class="hint-box">
+        <table>
+          <tr><th>지시 유형</th><th>핵심 대응 방법</th></tr>
+          <tr><td>긴급 지시</td><td>즉시 수용 의지 표현 → 15초 내 최소 요점(무엇·어디에·언제까지) 확인 → 즉시 실행</td></tr>
+          <tr><td>모호한 지시</td><td>'복창'으로 확인 → 목적(Why) 질문 → 선택지 제시("A안/B안 중 어느 쪽이 좋을까요?")</td></tr>
+          <tr><td>복수(여러 상사) 지시</td><td>혼자 우선순위 정하지 않음 → 직속 상사에게 투명하게 보고 후 지시 받기</td></tr>
+        </table>
+      </div>
+      <textarea id="q9" placeholder="답변을 입력해주세요..."></textarea>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-card">
+      <div class="q-tag">Q10 · 제3장 · 주관식</div>
+      <div class="q-ref">📖 참고: 전화 예절 (31쪽)</div>
+      <div class="q-title">전화 예절</div>
+      <div class="q-body">팀원 A가 자리를 오래 비운 사이 고객사에서 전화가 왔습니다. 당신이라면 이 전화를 받겠습니까, 받지 않겠습니까? 그 이유와 함께, 받는다면 컬처북의 <strong>전화 받을 때 7원칙</strong>을 바탕으로 어떻게 응대할지 구체적으로 써주세요.</div>
+      <div class="hint-box">
+        <table>
+          <tr><th>원칙</th><th>내용</th></tr>
+          <tr><td>① 3회 이내 수신</td><td>벨이 3회 이상 울리지 않게 받는다</td></tr>
+          <tr><td>② 소속·이름 밝히기</td><td>'감사합니다. 테스코㈜ ○○팀 ○○○입니다'</td></tr>
+          <tr><td>③ 경청·메모</td><td>차분하게 요점을 메모한다</td></tr>
+          <tr><td>④ 임의 답변 금지</td><td>모를 땐 '확인 후 연락드리겠습니다'</td></tr>
+          <tr><td>⑤ 중요 용건 재확인</td><td>복잡한 내용은 요점을 재확인</td></tr>
+          <tr><td>⑥ 끝맺음 인사</td><td>'감사합니다. 안녕히 계십시오'</td></tr>
+          <tr><td>⑦ 상대 먼저 끊기</td><td>상대가 끊는 것 확인 후 수화기 내려놓기</td></tr>
+        </table>
+      </div>
+      <textarea id="q10" placeholder="답변을 입력해주세요..."></textarea>
+    </div>
+
+    <!-- Q11 -->
+    <div class="q-card">
+      <div class="q-tag">Q11 · 제5장 · 주관식</div>
+      <div class="q-ref">📖 참고: 전자결재 (39쪽), 자주 하는 실수 (41쪽)</div>
+      <div class="q-title">기안 없는 세금계산서 (전자결재 7대 원칙)</div>
+      <div class="q-body">거래처로부터 세금계산서가 발행됐습니다. 그런데 ERP를 확인해 보니 해당 건의 기안서가 등록되어 있지 않아 지출 처리가 완료되지 않은 상태입니다. 재무회계파트에서 "미지출 건 기안서 작성 요청" 공지가 내려왔습니다. <strong>(1)</strong> 어떤 ERP 원칙이 지켜지지 않은 건가요? <strong>(2)</strong> 이런 누락이 생기는 원인이 무엇이라고 생각하나요? 재발 방지를 위한 개선 방안을 써주세요.</div>
+      <div class="hint-box">
+        <table>
+          <tr><th>원칙</th><th>내용</th></tr>
+          <tr><td>① 선결재 후집행</td><td>모든 지출·계약은 결재 완료 후 집행</td></tr>
+          <tr><td>② 증빙 필수</td><td>견적서·계약서·세금계산서 등 반드시 첨부</td></tr>
+          <tr><td>③ 권한 준수</td><td>본인 결재 권한 범위 내에서만 상신</td></tr>
+          <tr><td>④ 사실 기재</td><td>금액·수량·일자를 정확히 입력</td></tr>
+          <tr><td>⑤ 직무 분리</td><td>기안자·승인자·집행자 분리</td></tr>
+          <tr><td>⑥ 적시 처리</td><td>결재 요청·승인 모두 지연 없이</td></tr>
+          <tr><td>⑦ 수정 이력 보존</td><td>반려·수정 시 사유 및 이력 삭제 금지</td></tr>
+        </table>
+      </div>
+      <textarea id="q11" placeholder="(1) 위반 원칙:\n(2) ERP 기록이 잘 안 되는 원인 및 개선 방안:"></textarea>
+    </div>
+
+    <!-- Q12 -->
+    <div class="q-card">
+      <div class="q-tag">Q12 · 제6장 · 주관식</div>
+      <div class="q-ref">📖 참고: 4대 역량 (54쪽)</div>
+      <div class="q-title">역량 성장 계획</div>
+      <div class="q-body">테스코㈜의 4대 핵심역량은 <strong>직무 전문성 · 문제 해결력 · 커뮤니케이션 · 디지털·AI 활용</strong>입니다. 지금 본인이 맡은 업무를 돌아봤을 때, 아직 부족하다고 느끼는 역량을 하나 골라 구체적인 성장 방법을 써주세요.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px"><input type="radio" name="q12_val" value="직무 전문성"> 직무 전문성</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px"><input type="radio" name="q12_val" value="문제 해결력"> 문제 해결력</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px"><input type="radio" name="q12_val" value="커뮤니케이션"> 커뮤니케이션</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px"><input type="radio" name="q12_val" value="디지털·AI 활용"> 디지털·AI 활용</label>
+      </div>
+      <textarea id="q12" placeholder="선택한 역량이 부족하다고 느끼는 이유와, 성장을 위한 구체적인 방법을 써주세요."></textarea>
+    </div>
+
+
+    <!-- Q13 -->
+    <div class="q-card">
+      <div class="q-tag">Q13 · 제7장 · 주관식</div>
+      <div class="q-ref">📖 참고: AI 업무 활용 (57쪽)</div>
+      <div class="q-title">AI 활용 성과 경험</div>
+      <div class="q-body">AI를 활용해 기존 업무 방식을 바꾸고 더 좋은 결과를 낸 경험이 있다면 구체적으로 써주세요. <strong>아직 경험이 없다면</strong>, 앞으로 어떤 업무에 AI를 활용해 개선해보고 싶은지 써주세요.</div>
+      <textarea id="q13" placeholder="[경험 있는 경우]\n기존 방식:\nAI 활용 방식:\n달라진 결과:\n\n[아직 경험 없는 경우]\n개선해보고 싶은 업무:\n기대하는 변화:"></textarea>
+    </div>
+
+    <!-- Q14 -->
+    <div class="q-card">
+      <div class="q-tag">Q14 · 전체 · 주관식</div>
+      <div class="q-ref">📖 참고: 성장 로드맵 (54쪽)</div>
+      <div class="q-title">업무 진척도 자기 점검</div>
+      <div class="q-body">현재 본인이 맡고 있는 업무 중 <strong>진척도가 낮거나 정체되어 있다고 느끼는 업무</strong>와, 반대로 <strong>눈에 띄게 발전했다고 느끼는 업무</strong>를 각각 한 가지씩 골라 써주세요. 왜 그렇게 느끼는지, 앞으로 어떻게 개선하거나 발전시킬지도 함께 써주세요.</div>
+      <div style="overflow-x:auto">
+        <table class="check-table" id="q14-table">
+          <tr>
+            <th style="width:22%">구분</th>
+            <th style="width:28%">업무명</th>
+            <th style="width:28%">현재 상태 / 이유</th>
+            <th style="width:22%">앞으로 계획</th>
+          </tr>
+          <tr>
+            <td>📉 진척 낮음</td>
+            <td><input type="text" id="q14a1" placeholder="업무명"></td>
+            <td><input type="text" id="q14a2" placeholder="이유"></td>
+            <td><input type="text" id="q14a3" placeholder="개선 방법"></td>
+          </tr>
+          <tr>
+            <td>📈 발전된 점</td>
+            <td><input type="text" id="q14b1" placeholder="업무명"></td>
+            <td><input type="text" id="q14b2" placeholder="이유"></td>
+            <td><input type="text" id="q14b3" placeholder="발전 계획"></td>
+          </tr>
+        </table>
+      </div>
+      <textarea id="q14-extra" placeholder="추가 소감 (선택)..." style="margin-top:10px;min-height:70px"></textarea>
+    </div>
+
+    <!-- Q15 -->
+    <div class="q-card">
+      <div class="q-tag">Q15 · 전체 · 주관식</div>
+      <div class="q-ref">📖 참고: 핵심가치·인재상 (7쪽)</div>
+      <div class="q-title">나의 2027년 목표와 실천계획</div>
+      <div class="q-body">2027년 사업계획을 세우는 시기입니다. 회사가 목표를 세우듯 나도 내년 목표를 세워 봅니다. 핵심가치와 인재상 가운데 2027년에 꼭 실천하고 싶은 한 가지를 골라 주세요. 그리고 그것을 나의 내년 목표로 삼아 아래 세 가지가 드러나게 써 주세요.</div>
+      <textarea id="q15" placeholder="① 선택한 가치 / 인재상:\n② 구체적인 실천 방법:\n③ 목표 달성 기준(어떻게 되면 잘 한 것인지):"></textarea>
+    </div>
+  </div>
+
+  <button id="submit-btn" disabled>제출하기</button>
+</div>
+
+<div id="done-screen">
+  <div class="done-icon">🎉</div>
+  <h2>제출 완료!</h2>
+  <p>소중한 응답 감사합니다.</p>
+  <div style="margin-top:16px;padding:14px 18px;background:var(--hint-bg);border:1px solid var(--hint-border);border-radius:8px;font-size:13px;color:var(--fg2);text-align:left;line-height:1.9">
+    <div style="font-weight:700;color:var(--fg);margin-bottom:6px">📌 안내사항</div>
+    <div>· 결과는 <strong>인사총무파트</strong>에서 취합 후 개인별로 안내드릴 예정입니다.</div>
+    <div>· 문의사항이 있으시면 인사총무파트로 연락해주세요.</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz0j_gWsoLLMpBuRqRkf6tptKZkZWW_a8O7uhntoodQA1TvBF-XFhRaIQ76-MUc8lveFQ/exec';
+const TOTAL_Q = 15;
+let userId = null;
+
+// Count answered questions for progress
+function countAnswered() {
+  let n = 0;
+  // MC q1~q5
+  for (let i = 1; i <= 5; i++) {
+    if (document.querySelector(`input[name="q${i}"]:checked`)) n++;
+  }
+  // Text q6~q13, q15
+  [6,7,8,9,10,11,12,13,15].forEach(i => {
+    const el = document.getElementById(`q${i}`);
+    if (el && el.value.trim().length > 5) n++;
+  });
+  // Q14 table
+  const q14a1 = document.getElementById('q14a1');
+  const q14b1 = document.getElementById('q14b1');
+  if (q14a1 && q14a1.value.trim() && q14b1 && q14b1.value.trim()) n++;
+  return n;
+}
+
+function updateProgress() {
+  const n = countAnswered();
+  const pct = Math.round(n / TOTAL_Q * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('q-counter').textContent = n + ' / ' + TOTAL_Q;
+  const agreed = document.getElementById('f-agree')?.checked;
+  const name = document.getElementById('f-name')?.value.trim();
+  const site = document.getElementById('f-site')?.value;
+  const dept = document.getElementById('f-dept')?.value;
+  const team = document.getElementById('f-team')?.value.trim();
+  document.getElementById('submit-btn').disabled = (n < TOTAL_Q || !agreed || !name || !site || !dept || !team);
+}
+
+function showToast(msg, dur = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// MC option styling
+document.querySelectorAll('.mc-options').forEach(grp => {
+  grp.querySelectorAll('input[type=radio]').forEach(r => {
+    r.addEventListener('change', () => {
+      grp.querySelectorAll('.mc-opt').forEach(o => o.classList.remove('selected'));
+      r.closest('.mc-opt').classList.add('selected');
+      updateProgress();
+    });
+  });
+});
+
+// Textarea / checkbox change
+document.querySelectorAll('textarea, .check-table input').forEach(el => {
+  el.addEventListener('input', updateProgress);
+});
+document.getElementById('f-agree')?.addEventListener('change', updateProgress);
+document.getElementById('f-name')?.addEventListener('input', updateProgress);
+document.getElementById('f-site')?.addEventListener('change', () => { filterDept(); updateProgress(); });
+document.getElementById('f-dept')?.addEventListener('change', updateProgress);
+document.getElementById('f-team')?.addEventListener('input', updateProgress);
+
+const SITE_DEPT = {
+  '대전 본사공장': ['솔루션사업부', '경영관리그룹', '엔지니어링사업부', '직속'],
+  '개발센터': ['재료시험사업부', '캐노피개발부', '캐노피사업부', '항공전략기획', '직속'],
+  '진주공장': ['텐나인사업부', '기업부설연구소']
+};
+
+function filterDept() {
+  const site = document.getElementById('f-site').value;
+  const deptSel = document.getElementById('f-dept');
+  const depts = SITE_DEPT[site] || [];
+  deptSel.innerHTML = '<option value="">선택하세요</option>';
+  depts.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d;
+    deptSel.appendChild(opt);
+  });
+}
+
+// Submit
+document.getElementById('submit-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '제출 중...';
+
+  const answers = {
+    submittedAt: new Date().toISOString(),
+    info: {
+      name: document.getElementById('f-name').value.trim(),
+      site: document.getElementById('f-site').value,
+      dept: document.getElementById('f-dept').value,
+      team: document.getElementById('f-team').value.trim()
+    },
+    mc: {},
+    subjective: {}
+  };
+
+  for (let i = 1; i <= 5; i++) {
+    const sel = document.querySelector(`input[name="q${i}"]:checked`);
+    answers.mc[`q${i}`] = sel ? sel.value : '';
+  }
+  [6,7,8,9,10,11,12,13,15].forEach(i => {
+    answers.subjective[`q${i}`] = document.getElementById(`q${i}`).value.trim();
+  });
+  const q12val = document.querySelector('input[name="q12_val"]:checked');
+  answers.subjective.q12_역량 = q12val ? q12val.value : '';
+  answers.subjective.q14 = {
+    low: { task: document.getElementById('q14a1').value, reason: document.getElementById('q14a2').value, plan: document.getElementById('q14a3').value },
+    high: { task: document.getElementById('q14b1').value, reason: document.getElementById('q14b2').value, plan: document.getElementById('q14b3').value },
+    extra: document.getElementById('q14-extra').value.trim()
+  };
+
+  try {
+    await fetch(GAS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify({...answers, userId})
+    });
+    try { localStorage.setItem('cbook2_done_' + userId, '1'); } catch(e) {}
+    document.getElementById('survey-wrap').hidden = true;
+    document.getElementById('done-screen').style.display = 'block';
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '제출하기';
+    showToast('오류: ' + e.message, 5000);
+  }
+});
+
+// Init
+function init() {
+  const loading = document.getElementById('loading');
+  try {
+    let uid = localStorage.getItem('cbook2_uid');
+    if (!uid) {
+      uid = 'u_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem('cbook2_uid', uid);
+    }
+    userId = uid;
+    if (localStorage.getItem('cbook2_done_' + uid)) {
+      loading.hidden = true;
+      document.getElementById('already-done').style.display = 'block';
+      return;
+    }
+  } catch(e) {
+    userId = 'u_' + Date.now();
+  }
+  loading.hidden = true;
+  document.getElementById('survey-wrap').hidden = false;
+  updateProgress();
+}
+
+init();
+</script>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div id="admin-wrap" hidden>
+  <style>
+    #admin-wrap { font-family: 'Noto Sans KR', system-ui, sans-serif; }
+    #admin-login {
+      max-width: 360px; margin: 80px auto; padding: 32px 24px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      text-align: center;
+    }
+    #admin-login h2 { font-family: 'Noto Serif KR', serif; font-size: 18px; margin-bottom: 20px; }
+    #admin-login input {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--border);
+      border-radius: 8px; font-size: 15px; font-family: inherit;
+      background: var(--bg); color: var(--fg); margin-bottom: 12px;
+    }
+    #admin-login input:focus { outline: none; border-color: var(--accent); }
+    #admin-login button {
+      width: 100%; padding: 12px; background: var(--accent); color: #fff;
+      border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+    }
+    #admin-login .err { color: #dc2626; font-size: 13px; margin-top: 8px; }
+
+    #admin-dash { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+    .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+    .admin-header h2 { font-family: 'Noto Serif KR', serif; font-size: 20px; }
+    .admin-stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .admin-stat {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px 18px; font-size: 13px; color: var(--fg2); min-width: 130px;
+    }
+    .admin-stat strong { display: block; font-size: 22px; color: var(--fg); margin-bottom: 2px; }
+
+    .resp-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      margin-bottom: 14px; overflow: hidden;
+    }
+    .resp-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; cursor: pointer; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .resp-head:hover { background: var(--accent-light); }
+    .resp-name { font-weight: 700; font-size: 15px; }
+    .resp-meta { font-size: 12px; color: var(--fg2); }
+    .resp-score { font-size: 13px; font-weight: 700; color: var(--accent); white-space: nowrap; }
+    .resp-body { display: none; padding: 16px; }
+    .resp-body.open { display: block; }
+
+    .mc-result { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 16px; }
+    .mc-r-row {
+      display: flex; align-items: flex-start; gap: 10px; padding: 8px 12px;
+      border: 1px solid var(--border); border-radius: 7px; font-size: 13px;
+    }
+    .mc-r-row.c-correct { border-color: #16a34a; background: #f0fdf4; }
+    .mc-r-row.c-wrong { border-color: #dc2626; background: #fef2f2; }
+    .mc-r-badge { font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .badge-o { color: #16a34a; }
+    .badge-x { color: #dc2626; }
+    .badge-empty { color: var(--fg2); }
+
+    .subj-section { margin-top: 12px; }
+    .subj-item { margin-bottom: 12px; }
+    .subj-label { font-size: 11px; font-weight: 700; color: var(--fg2); letter-spacing: .05em; margin-bottom: 4px; }
+    .subj-text {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+      padding: 10px 12px; font-size: 13px; color: var(--fg); white-space: pre-wrap; line-height: 1.7;
+    }
+
+    .admin-empty { text-align: center; padding: 48px; color: var(--fg2); font-size: 14px; }
+    .dept-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .dept-btn {
+      padding: 5px 12px; border: 1px solid var(--border); border-radius: 99px;
+      background: var(--bg); color: var(--fg); font-size: 12px; cursor: pointer;
+      font-family: inherit;
+    }
+    .dept-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  </style>
+
+  <!-- Login -->
+  <div id="admin-login">
+    <div style="font-size:32px;margin-bottom:12px">🔐</div>
+    <h2>관리자 응답 현황</h2>
+    <input type="password" id="admin-pw" placeholder="관리자 비밀번호">
+    <button onclick="adminLogin()">로그인</button>
+    <div class="err" id="admin-err" hidden>비밀번호가 올바르지 않습니다.</div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="admin-dash" hidden>
+    <div class="admin-header">
+      <h2>📊 1차 설문 응답 현황 (3분기)</h2>
+      <div style="font-size:12px;color:var(--fg2)" id="admin-updated"></div>
+    </div>
+    <div class="admin-stat-row" id="admin-stats"></div>
+    <div class="dept-filter" id="dept-filter"></div>
+    <div id="resp-list"></div>
+  </div>
+</div>
+
+<script>
+// Admin mode detection
+(function() {
+  const isAdmin = location.search.includes('admin') || location.hash === '#admin';
+  if (!isAdmin) return;
+
+  // Hide survey, show admin panel
+  document.getElementById('loading').hidden = true;
+  document.getElementById('survey-wrap').hidden = true;
+  document.getElementById('admin-wrap').hidden = false;
+
+  // Enter key on pw field
+  document.getElementById('admin-pw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') adminLogin();
+  });
+  setTimeout(() => document.getElementById('admin-pw').focus(), 100);
+})();
+
+const CORRECT = { q1:'3', q2:'4', q3:'3', q4:'3', q5:'1' };
+const MC_OPTS = {
+  q1: ['','친절하게 알려준다','필요할 때만 지원','SOP 문서화 + 설명회','팀장에게 교육 요청'],
+  q2: ['','전면 전환','현행 유지','AI 교육 후 검토','파일럿 병행 후 공유'],
+  q3: ['','필요한 만큼 구매','구두 보고','수치 분석 후 선제 보고','다른 팀 예산 차용'],
+  q4: ['','인력 충원 요청','경영진 과제 방관','KPI 설정·팀장 합의','시키는 것만 처리'],
+  q5: ['','주 1회 점검·우선순위 조율','멘토링 미룸','의무적 일지 제출','멘토 교체 요청']
+};
+const Q_LABELS = {
+  q1:'Q1 재료시험 세팅 노하우', q2:'Q2 보고서 AI 자동화',
+  q3:'Q3 예산 초과 징조', q4:'Q4 ERP 기준 강화', q5:'Q5 신입 멘토링'
+};
+const SUBJ_LABELS = {
+  q6:'Q6 업무 우선순위와 중간보고', q7:'Q7 이슈 등급', q8:'Q8 CIPER 5단계',
+  q9:'Q9 유형별 지시 대응', q10:'Q10 전화 예절·이석 기준', q11:'Q11 ERP 원칙',
+  q12:'Q12 역량 성장 계획 (선택 역량 + 내용)', q13:'Q13 AI 활용 성과 경험', q14:'Q14 업무 진척도 점검',
+  q15:'Q15 컬처북 실천 계획'
+};
+
+let allResps = [];
+let activeFilter = '전체';
+
+async function adminLogin() {
+  const pw = document.getElementById('admin-pw').value;
+  const err = document.getElementById('admin-err');
+  if (pw !== 'testcor2026') { err.hidden = false; return; }
+  err.hidden = true;
+  document.getElementById('admin-login').hidden = true;
+  document.getElementById('admin-dash').hidden = false;
+  await loadResponses();
+}
+
+async function loadResponses() {
+  try {
+    const res = await fetch(GAS_URL);
+    const j = await res.json();
+    allResps = (j.rows || []);
+    allResps.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+  } catch(e) {
+    allResps = [];
+  }
+  renderDash();
+}
+
+function calcScore(r) {
+  let mc = 0;
+  for (let i = 1; i <= 5; i++) {
+    const k = 'q' + i;
+    if (r.mc && r.mc[k] === CORRECT[k]) mc++;
+  }
+  return mc;
+}
+
+function renderDash() {
+  const total = allResps.length;
+  const perfectMC = allResps.filter(r => calcScore(r) === 5).length;
+  document.getElementById('admin-updated').textContent = `마지막 갱신 ${new Date().toLocaleString('ko-KR')}`;
+
+  // Stats
+  const sites = {};
+  allResps.forEach(r => {
+    const s = r.info?.site || '미상';
+    sites[s] = (sites[s] || 0) + 1;
+  });
+  const statsHtml = [
+    `<div class="admin-stat"><strong>${total}</strong>총 응답 수</div>`,
+    `<div class="admin-stat"><strong>${perfectMC}</strong>객관식 만점</div>`,
+    ...Object.entries(sites).map(([s,n]) => `<div class="admin-stat"><strong>${n}</strong>${s}</div>`)
+  ].join('');
+  document.getElementById('admin-stats').innerHTML = statsHtml;
+
+  // Dept filter
+  const depts = ['전체', ...new Set(allResps.map(r => r.info?.dept).filter(Boolean))];
+  document.getElementById('dept-filter').innerHTML = depts.map(d =>
+    `<button class="dept-btn ${d===activeFilter?'active':''}" onclick="setFilter('${d}')">${d}</button>`
+  ).join('');
+
+  renderList();
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  renderDash();
+}
+
+function renderList() {
+  const filtered = activeFilter === '전체' ? allResps : allResps.filter(r => r.info?.dept === activeFilter);
+  const el = document.getElementById('resp-list');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="admin-empty">응답이 없습니다.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map((r, idx) => {
+    const score = calcScore(r);
+    const info = r.info || {};
+    const dt = r.submittedAt ? new Date(r.submittedAt).toLocaleString('ko-KR') : '-';
+
+    // MC rows
+    const mcRows = [1,2,3,4,5].map(i => {
+      const k = 'q' + i;
+      const ans = r.mc?.[k] || '';
+      const isCorrect = ans === CORRECT[k];
+      const isEmpty = !ans;
+      const cls = isEmpty ? '' : (isCorrect ? 'c-correct' : 'c-wrong');
+      const badge = isEmpty ? '<span class="mc-r-badge badge-empty">—</span>' :
+                    isCorrect ? '<span class="mc-r-badge badge-o">O</span>' :
+                                '<span class="mc-r-badge badge-x">X</span>';
+      const optText = ans ? (MC_OPTS[k][+ans] || ans) : '미응답';
+      const correctText = isCorrect ? '' : `<span style="font-size:11px;color:#16a34a;margin-left:6px">▶ 정답: ${MC_OPTS[k][+CORRECT[k]]}</span>`;
+      return `<div class="mc-r-row ${cls}">${badge}<span><strong>${Q_LABELS[k]}</strong> — ②${optText}${correctText}</span></div>`;
+    }).join('');
+
+    // Subjective
+    const subj = r.subjective || {};
+    const subjHtml = Object.entries(SUBJ_LABELS).map(([k, label]) => {
+      let val = '';
+      if (k === 'q14') {
+        const q14 = subj.q14 || {};
+        val = [
+          q14.low?.task ? `📉 ${q14.low.task} / ${q14.low.reason} → ${q14.low.plan}` : '',
+          q14.high?.task ? `📈 ${q14.high.task} / ${q14.high.reason} → ${q14.high.plan}` : '',
+          q14.extra ? `소감: ${q14.extra}` : ''
+        ].filter(Boolean).join('\n');
+      } else if (k === 'q12') {
+        const sel = subj.q12_역량 ? `[${subj.q12_역량}] ` : '';
+        val = sel + (subj.q12 || '');
+      } else {
+        val = subj[k] || '';
+      }
+      if (!val) return '';
+      return `<div class="subj-item"><div class="subj-label">${label}</div><div class="subj-text">${val}</div></div>`;
+    }).join('');
+
+    return `
+    <div class="resp-card">
+      <div class="resp-head" onclick="toggleResp(${idx})">
+        <div>
+          <div class="resp-name">${info.name || '(미입력)'}</div>
+          <div class="resp-meta">${info.site || ''} · ${info.dept || ''} · ${info.team || ''} · ${dt}</div>
+        </div>
+        <div class="resp-score">객관식 ${score}/5</div>
+      </div>
+      <div class="resp-body" id="resp-body-${idx}">
+        <div style="font-size:12px;font-weight:700;color:var(--fg2);margin-bottom:8px">▪ 객관식 정답 확인 (Q1~Q5)</div>
+        <div class="mc-result">${mcRows}</div>
+        <div class="subj-section">
+          <div style="font-size:12px;font-weight:700;color:var(--fg2);margin-bottom:8px">▪ 주관식 응답 (Q6~Q15)</div>
+          ${subjHtml || '<div style="font-size:13px;color:var(--fg2)">주관식 응답 없음</div>'}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleResp(idx) {
+  const el = document.getElementById('resp-body-' + idx);
+  el.classList.toggle('open');
+}
+</script>
+
+</body></html>
